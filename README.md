@@ -21,7 +21,7 @@ return array(
                 '50mbps' => '50mbps',
                 '100mbps' => '100mbps',
 				'add more here' => 'add more here'
-
+ 
 bagian ini dapat di edit sesuai kebutuhan.
 
 
