@@ -22,7 +22,9 @@ return array(
 bagian ini dapat di edit sesuai kebutuhan.
 
 
-
+fitur customer:
+![alt text](https://devan.id/Informasi.png)
+![alt text](https://devan.id/Status-Koneksi.png)
 
 
 
