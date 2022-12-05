@@ -27,6 +27,9 @@ fitur customer:
 ![alt text](https://devan.id/Status-Koneksi.png)
 
 
+fitur admin:
+
+![alt text](https://devan.id/Admin.png)
 
 
 
