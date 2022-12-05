@@ -4,9 +4,9 @@ ini adalah module server mikrotik untuk auto provision secret ppp / akun ppp di 
 
 untuk persyaratannya adalah mikrotik anda harus ada di RouterOS versi 7. disarankan versi stable terakhir karna sudah ada fitur https rest api
 
-untuk penggunaannya bisa download file ini. lalu masukan ke folder /{whmcs-root-path}/modules/servers/cikipeh/{disini}
+untuk penggunaannya bisa download zip repo ini. lalu masukan ke folder /{whmcs-root-path}/{extract-disini}
 
-beberapahal yang dapat di customize adalah paket paket / profile yang tersedia di router anda masing masing
+beberapa hal yang dapat di customize adalah paket paket / profile yang tersedia di router anda masing masing
 return array(
         'Profile' => array(
             'Type' => 'dropdown',
