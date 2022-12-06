@@ -527,6 +527,119 @@ function cikipeh_actionOneFunction(array $params)
     return 'success';
 }
 
+function cikipeh_AdminServicesTabFields(array $params)
+{
+    try {
+        // Call the service's function, using the values provided by WHMCS in
+        // `$params`.
+    $idpelanggan = $params['username'];
+    $passinternet = $params['password'];
+    $userserver = $params['serverusername'];
+    $passserver =  $params['serverpassword'];
+    $brasip = $params['serverip'];
+    $paketnya = $params['configoption1'];
+    $aman = 'https://';
+    $apinya = '/rest/ppp/active';
+    $apisatunya = '/rest/ppp/secret';
+    $apisatunya2 = '/rest/ppp/profile';
+    $apisatunya3 = '/rest/system/resource';
+    $serverPort = $params['serverport'];
+    $urlpanggil = $aman . $brasip . ':' . $serverPort . $apinya;
+    $urlpanggil2 = $aman . $brasip . ':' . $serverPort . $apisatunya;
+    $urlpanggil3 = $aman . $brasip . ':' . $serverPort . $apisatunya2;
+    $urlambil = $urlpanggil . '/' . $idpelanggan;
+    $urlambil2 = $urlpanggil2 . '/' . $idpelanggan;
+    $urlambil3 = $urlpanggil3 . '/' . $paketnya;
+    $brrcikipeh = curl_init();
+    curl_setopt($brrcikipeh, CURLOPT_URL, $urlambil);
+    curl_setopt($brrcikipeh, CURLOPT_RETURNTRANSFER, 1);
+    curl_setopt($brrcikipeh, CURLOPT_SSL_VERIFYHOST, FALSE);
+    curl_setopt($brrcikipeh, CURLOPT_SSL_VERIFYPEER, FALSE);
+    curl_setopt($brrcikipeh, CURLOPT_HTTPAUTH, CURLAUTH_BASIC);
+    curl_setopt($brrcikipeh, CURLOPT_USERPWD, $userserver . ':' . $passserver);
+    curl_setopt($brrcikipeh, CURLOPT_CUSTOMREQUEST, 'GET');
+    $eksekusi = curl_exec($brrcikipeh);
+    
+    $data = json_decode($eksekusi, true);
+    
+    $brrcikipeh3 = curl_init();
+    curl_setopt($brrcikipeh3, CURLOPT_URL, $urlambil2);
+    curl_setopt($brrcikipeh3, CURLOPT_RETURNTRANSFER, 1);
+    curl_setopt($brrcikipeh3, CURLOPT_SSL_VERIFYHOST, FALSE);
+    curl_setopt($brrcikipeh3, CURLOPT_SSL_VERIFYPEER, FALSE);
+    curl_setopt($brrcikipeh3, CURLOPT_HTTPAUTH, CURLAUTH_BASIC);
+    curl_setopt($brrcikipeh3, CURLOPT_USERPWD, $userserver . ':' . $passserver);
+    curl_setopt($brrcikipeh3, CURLOPT_CUSTOMREQUEST, 'GET');
+    $eksekusi3 = curl_exec($brrcikipeh3);
+    
+    $data3 = json_decode($eksekusi3, true);
+    
+    $brrcikipeh5 = curl_init();
+    curl_setopt($brrcikipeh5, CURLOPT_URL, $urlambil3);
+    curl_setopt($brrcikipeh5, CURLOPT_RETURNTRANSFER, 1);
+    curl_setopt($brrcikipeh5, CURLOPT_SSL_VERIFYHOST, FALSE);
+    curl_setopt($brrcikipeh5, CURLOPT_SSL_VERIFYPEER, FALSE);
+    curl_setopt($brrcikipeh5, CURLOPT_HTTPAUTH, CURLAUTH_BASIC);
+    curl_setopt($brrcikipeh5, CURLOPT_USERPWD, $userserver . ':' . $passserver);
+    curl_setopt($brrcikipeh5, CURLOPT_CUSTOMREQUEST, 'GET');
+    $eksekusi5 = curl_exec($brrcikipeh5);
+    
+    $data5 = json_decode($eksekusi5, true);
+    
+    $httpcode = curl_getinfo($brrcikipeh, CURLINFO_HTTP_CODE);
+    if($httpcode == 200){
+        $ipcustomer = $data['address'];
+        $maccustomer = $data['caller-id'];
+        $uptimecustomer = $data['uptime'];
+    }
+    else if($httpcode == 400){
+        $ipcustomer = "Disconnected";
+        $maccustomer = "Disconnected";
+        $uptimecustomer = "Disconnected";
+    }
+    $httpcode2 = curl_getinfo($brrcikipeh3, CURLINFO_HTTP_CODE);
+    if($httpcode2 == 200){
+        $lastdisconnectreason = $data3['last-disconnect-reason'];
+        $lastlogout = $data3['last-logged-out'];
+    }
+    else if($httpcode2 == 400){
+        $lastdisconnectreason = "PPP Secret Not Found!";
+        $lastlogout = "PPP Secret Not Found!";
+    }
+    $httpcode3 = curl_getinfo($brrcikipeh5, CURLINFO_HTTP_CODE);
+    if($httpcode3 == 200){
+        $ratelimit = $data5['rate-limit'];
+    }
+    else if($httpcode3 == 400){
+        $ratelimit = "PPP Profile Not Found!";
+    }
+
+        $response = array();
+
+        return array(
+            'IP Address' => $ipcustomer,
+            'Mac Address' => $maccustomer,
+            'Uptime Customer' => $uptimecustomer,
+            'Alasan Terakhir Terputus'=> $lastdisconnectreason,
+            'Waktu Terakhir Terputus'=> $lastlogout,
+            'Limit Kecepatan (Download/Upload)' => $ratelimit,
+        );
+    } catch (Exception $e) {
+        // Record the error in WHMCS's module log.
+        logModuleCall(
+            'provisioningmodule',
+            __FUNCTION__,
+            $params,
+            $e->getMessage(),
+            $e->getTraceAsString()
+        );
+
+        // In an error condition, simply return no additional fields to display.
+    }
+
+    return array();
+}
+
 
 function cikipeh_AdminServicesTabFieldsSave(array $params)
 {
@@ -687,7 +800,19 @@ function cikipeh_ClientArea(array $params)
     $eksekusi5 = curl_exec($brrcikipeh5);
     
     $data5 = json_decode($eksekusi5, true);
-   
+   $httpcode = curl_getinfo($brrcikipeh, CURLINFO_HTTP_CODE);
+    if($httpcode == 200){
+        $ipcustomer = $data['address'];
+        $maccustomer = $data['caller-id'];
+        $uptimecustomer = $data['uptime'];
+        $sessioniduser = $data['session-id'];
+    }
+    else if($httpcode == 400){
+        $ipcustomer = "Disconnected";
+        $maccustomer = "Disconnected";
+        $uptimecustomer = "Disconnected";
+        $sessioniduser = "Disconnected";
+    }
 
 
 
@@ -699,10 +824,10 @@ function cikipeh_ClientArea(array $params)
         return array(
             'tabOverviewReplacementTemplate' => $templateFile,
             'templateVariables' => array(
-                'ipaddress' => $data['address'],
-                'macaddress' => $data['caller-id'],
-                'uptime' => $data['uptime'],
-                'sessionid' => $data['session-id'],
+                'ipaddress' => $ipcustomer,
+                'macaddress' => $maccustomer,
+                'uptime' => $uptimecustomer,
+                'sessionid' => $sessioniduser,
                 'servis' => $data['service'],
                 'lastdiscconectreason'=> $data3['last-disconnect-reason'],
                 'lastdiscconect'=> $data3['last-logged-out'],
