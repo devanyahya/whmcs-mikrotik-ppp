@@ -20,41 +20,74 @@ function cikipeh_MetaData()
 
 function cikipeh_ConfigOptions()
 {
-    return array(
-        'Profile' => array(
+    
+       return [
+        'Profile' => [
             'Type' => 'text',
-            'Size' => '10',
-            'Default' => '64',
-            'Description' => 'Masukan nama Profile yang ada pada mikrotik untuk paket ini',
-        ),
-        'Service' => array(
+            'Loader' => 'cikipeh_LoaderFunction',
+            'Size' => '15',
+            'SimpleMode' => 'true',
+            'Description' => 'Pilih profile yang ingin digunakan'
+        ],
+        'Service' => [
             'Type' => 'dropdown',
-            'Options' => array(
+            'SimpleMode' => 'true',
+            'Options' => [
                 'any' => 'any',
                 'pppoe' => 'pppoe',
                 'l2tp' => 'l2tp',
                 'ovpn' => 'ovpn',
                 'async' => 'async',
                 'sstp' => 'sstp',
-				//tipe layanannya
-            ),
-            'Description' => 'Pilih tipe layanan yang ingin digunakan untuk paket ini'
-            
-        ),
-        'Tipe Suspend' => array(
+            ],
+        ],
+        'Tipe Suspend' => [
             'Type' => 'radio',
             'Options' => 'Suspend,Isolir',
-            'Description' => 'Pilih Suspend untuk mematikan secret/akun customer, Pilih Isolir untuk ubah profile ke isolir',
-        ),
-        'Profile Isolir' => array(
+            'Description' => 'Opsi Suspend untuk disable ppp secret customer, Opsi Isolir untuk ubah profile ke isolir',
+            'SimpleMode' => 'true'
+        ],
+        'Profile Isolir' => [
             'Type' => 'text',
-            'Size' => '10',
-            'Default' => '64',
+            'Loader' => 'cikipeh_LoaderFunction',
+            'Size' => '15',
             'Description' => 'Masukan nama Profile untuk Isolir',
-        ),
-    );
+            'SimpleMode' => 'true'
+        ]
+    ];
+ 
+
+   
 }
 
+function cikipeh_LoaderFunction($params){
+    $userserver = $params['serverusername'];
+    $passserver =  $params['serverpassword'];
+    $brasip = $params['serverip'];
+    $aman = 'https://';
+    $apinya = '/rest/ppp/profile';
+    $serverPort = $params['serverport'];
+    $panggil = $aman . $brasip . ':' . $serverPort . $apinya ;
+    $brrcikipeh = curl_init();
+    curl_setopt($brrcikipeh, CURLOPT_URL, $panggil);
+    curl_setopt($brrcikipeh, CURLOPT_RETURNTRANSFER, 1);
+    curl_setopt($brrcikipeh, CURLOPT_SSL_VERIFYHOST, FALSE);
+    curl_setopt($brrcikipeh, CURLOPT_SSL_VERIFYPEER, FALSE);
+    curl_setopt($brrcikipeh, CURLOPT_HTTPAUTH, CURLAUTH_BASIC);
+    curl_setopt($brrcikipeh, CURLOPT_USERPWD, $userserver . ':' . $passserver);
+    curl_setopt($brrcikipeh, CURLOPT_CUSTOMREQUEST, 'GET');
+    $eksekusi = curl_exec($brrcikipeh);
+    curl_close($brrcikipeh);
+    $datanya = json_decode($eksekusi, true);
+    $hasilnya = array_column($datanya, 'name');
+
+        $daftar = [];
+    foreach ($hasilnya as $hasilnya) {
+        $daftar[$hasilnya] = ucfirst($hasilnya);
+    }
+
+    return $daftar;
+}
 
 function cikipeh_CreateAccount($params)
 {
@@ -125,6 +158,7 @@ function cikipeh_SuspendAccount($params)
         "name" => $idpelanggan,
         "password" => $passinternet,
         "service" => $tipe,
+        "disabled" => "false",
         "profile" => $params['configoption4'],);
     $dipake_json = json_encode($yangmaudipake);
     $brrcikipeh = curl_init();
