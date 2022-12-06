@@ -46,6 +46,12 @@ function cikipeh_ConfigOptions()
             'Options' => 'Suspend,Isolir',
             'Description' => 'Pilih Suspend untuk mematikan secret/akun customer, Pilih Isolir untuk ubah profile ke isolir',
         ),
+        'Profile Isolir' => array(
+            'Type' => 'text',
+            'Size' => '10',
+            'Default' => '64',
+            'Description' => 'Masukan nama Profile untuk Isolir',
+        ),
     );
 }
 
@@ -119,7 +125,7 @@ function cikipeh_SuspendAccount($params)
         "name" => $idpelanggan,
         "password" => $passinternet,
         "service" => $tipe,
-        "profile" => "isolir",);
+        "profile" => $params['configoption4'],);
     $dipake_json = json_encode($yangmaudipake);
     $brrcikipeh = curl_init();
     curl_setopt($brrcikipeh, CURLOPT_URL, $urlubah);
