@@ -593,9 +593,14 @@ function cikipeh_AdminServicesTabFields(array $params)
         $uptimecustomer = $data['uptime'];
     }
     else if($httpcode == 400){
-        $ipcustomer = "Disconnected";
-        $maccustomer = "Disconnected";
-        $uptimecustomer = "Disconnected";
+        $ipcustomer = "User Disconnected";
+        $maccustomer = "User Disconnected";
+        $uptimecustomer = "User Disconnected";
+    }
+    else {
+        $ipcustomer = "Failed to Connect with BRAS/Server!";
+        $maccustomer = "Failed to Connect with BRAS/Server!";
+        $uptimecustomer = "Failed to Connect with BRAS/Server!";
     }
     $httpcode2 = curl_getinfo($brrcikipeh3, CURLINFO_HTTP_CODE);
     if($httpcode2 == 200){
@@ -606,12 +611,19 @@ function cikipeh_AdminServicesTabFields(array $params)
         $lastdisconnectreason = "PPP Secret Not Found!";
         $lastlogout = "PPP Secret Not Found!";
     }
+    else {
+        $lastdisconnectreason = "Failed to Connect with BRAS/Server!";
+        $lastlogout = "Failed to Connect with BRAS/Server!";
+    }
     $httpcode3 = curl_getinfo($brrcikipeh5, CURLINFO_HTTP_CODE);
     if($httpcode3 == 200){
         $ratelimit = $data5['rate-limit'];
     }
     else if($httpcode3 == 400){
         $ratelimit = "PPP Profile Not Found!";
+    }
+    else {
+        $ratelimit = "Failed to Connect with BRAS/Server!";
     }
 
         $response = array();
@@ -808,10 +820,16 @@ function cikipeh_ClientArea(array $params)
         $sessioniduser = $data['session-id'];
     }
     else if($httpcode == 400){
-        $ipcustomer = "Disconnected";
-        $maccustomer = "Disconnected";
-        $uptimecustomer = "Disconnected";
-        $sessioniduser = "Disconnected";
+        $ipcustomer = "User Disconnected";
+        $maccustomer = "User Disconnected";
+        $uptimecustomer = "User Disconnected";
+        $sessioniduser = "User Disconnected";
+    }
+    else {
+        $ipcustomer = "Failed to Connect with BRAS/Server!";
+        $maccustomer = "Failed to Connect with BRAS/Server!";
+        $uptimecustomer = "Failed to Connect with BRAS/Server!";
+        $sessioniduser = "Failed to Connect with BRAS/Server!";
     }
 
 
