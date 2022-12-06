@@ -41,6 +41,11 @@ function cikipeh_ConfigOptions()
             'Description' => 'Pilih tipe layanan yang ingin digunakan untuk paket ini'
             
         ),
+        'Tipe Suspend' => array(
+            'Type' => 'radio',
+            'Options' => 'Suspend,Isolir',
+            'Description' => 'Pilih Suspend untuk mematikan secret/akun customer, Pilih Isolir untuk ubah profile ke isolir',
+        ),
     );
 }
 
@@ -93,6 +98,7 @@ function cikipeh_CreateAccount($params)
 
 function cikipeh_SuspendAccount($params)
 {
+    if ($params['configoption3'] == Isolir ){
     $idpelanggan = $params['username'];
     $passinternet = $params['password'];
     $userserver = $params['serverusername'];
@@ -107,13 +113,13 @@ function cikipeh_SuspendAccount($params)
     $urlapisuspend = $aman . $brasip . ':' . $serverPort . $apisuspend;
     $paket = $params['configoption1'];
     $tipe = $params['configoption2'];
+    
     $urlkill = $urlapisuspend . '/' . $idpelanggan;
     $yangmaudipake = array(
         "name" => $idpelanggan,
         "password" => $passinternet,
         "service" => $tipe,
         "profile" => "isolir",);
-		//apabila ingin disable ppp account daripada memasukan ke profile isolir. bisa replace "profile" => "isolir", menjadi "disabled" => "true"
     $dipake_json = json_encode($yangmaudipake);
     $brrcikipeh = curl_init();
     curl_setopt($brrcikipeh, CURLOPT_URL, $urlubah);
@@ -152,6 +158,70 @@ function cikipeh_SuspendAccount($params)
     ));
     $eksekusi2 = curl_exec($brrcikipeh2);
     return 'success';
+    }
+    
+    else if ($params['configoption3'] == Suspend ){
+    $idpelanggan = $params['username'];
+    $passinternet = $params['password'];
+    $userserver = $params['serverusername'];
+    $passserver =  $params['serverpassword'];
+    $brasip = $params['serverip'];
+    $aman = 'https://';
+    $apinya = '/rest/ppp/secret';
+    $serverPort = $params['serverport'];
+    $urlpanggil = $aman . $brasip . ':' . $serverPort . $apinya;
+    $urlubah = $urlpanggil . '/' . $idpelanggan;
+    $apisuspend = '/rest/ppp/active';
+    $urlapisuspend = $aman . $brasip . ':' . $serverPort . $apisuspend;
+    $paket = $params['configoption1'];
+    $tipe = $params['configoption2'];
+    
+    $urlkill = $urlapisuspend . '/' . $idpelanggan;
+    $yangmaudipake = array(
+        "name" => $idpelanggan,
+        "password" => $passinternet,
+        "service" => $tipe,
+        "disabled" => "yes",);
+    $dipake_json = json_encode($yangmaudipake);
+    $brrcikipeh = curl_init();
+    curl_setopt($brrcikipeh, CURLOPT_URL, $urlubah);
+    curl_setopt($brrcikipeh, CURLOPT_RETURNTRANSFER, 1);
+    curl_setopt($brrcikipeh, CURLOPT_SSL_VERIFYHOST, FALSE);
+    curl_setopt($brrcikipeh, CURLOPT_SSL_VERIFYPEER, FALSE);
+    curl_setopt($brrcikipeh, CURLOPT_HTTPAUTH, CURLAUTH_BASIC);
+    curl_setopt($brrcikipeh, CURLOPT_USERPWD, $userserver . ':' . $passserver);
+    curl_setopt($brrcikipeh, CURLOPT_CUSTOMREQUEST, 'PATCH');
+    curl_setopt($brrcikipeh, CURLOPT_POSTFIELDS, $dipake_json);
+    curl_setopt($brrcikipeh, CURLOPT_HEADER, true);
+    curl_setopt($brrcikipeh, CURLOPT_HTTPHEADER,
+    array(
+        'Content-Type:application/json',
+        'Content-Length: ' . strlen($dipake_json)
+    ));
+    $eksekusi = curl_exec($brrcikipeh);
+    
+
+    //ini untuk kill session
+    $brrcikipeh2 = curl_init();
+    curl_setopt($brrcikipeh2, CURLOPT_URL, $urlkill);
+    curl_setopt($brrcikipeh2, CURLOPT_RETURNTRANSFER, 1);
+    curl_setopt($brrcikipeh2, CURLOPT_SSL_VERIFYHOST, FALSE);
+    curl_setopt($brrcikipeh2, CURLOPT_SSL_VERIFYPEER, FALSE);
+    curl_setopt($brrcikipeh2, CURLOPT_HTTPAUTH, CURLAUTH_BASIC);
+    curl_setopt($brrcikipeh2, CURLOPT_USERPWD, $userserver . ':' . $passserver);
+
+    curl_setopt($brrcikipeh2, CURLOPT_CUSTOMREQUEST, 'DELETE');
+    curl_setopt($brrcikipeh2, CURLOPT_POSTFIELDS, $dipake_json);
+    curl_setopt($brrcikipeh2, CURLOPT_HEADER, true);
+    curl_setopt($brrcikipeh2, CURLOPT_HTTPHEADER,
+    array(
+        'Content-Type:application/json',
+        'Content-Length: ' . strlen($dipake_json)
+    ));
+    $eksekusi2 = curl_exec($brrcikipeh2);
+    return 'success';
+    }
+    
 }
 
 
