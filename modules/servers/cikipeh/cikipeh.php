@@ -30,8 +30,8 @@ function cikipeh_ConfigOptions()
         'Service' => array(
             'Type' => 'dropdown',
             'Options' => array(
-                'pppoe' => 'pppoe',
                 'any' => 'any',
+                'pppoe' => 'pppoe',
                 'l2tp' => 'l2tp',
                 'ovpn' => 'ovpn',
                 'async' => 'async',
