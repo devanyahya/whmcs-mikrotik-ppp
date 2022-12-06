@@ -12,7 +12,7 @@ function cikipeh_MetaData()
         'DisplayName' => 'Cikipeh (Whmcs Module Mikrotik Rest API)',
         'APIVersion' => '1.1', 
         'RequiresServer' => true, 
-        'DefaultNonSSLPort' => '80', 
+        'DefaultNonSSLPort' => '443', 
         'DefaultSSLPort' => '443', 
     );
 }
@@ -22,16 +22,10 @@ function cikipeh_ConfigOptions()
 {
     return array(
         'Profile' => array(
-            'Type' => 'dropdown',
-            'Options' => array(
-                '5mbps' => '5mbps',
-                '10mbps' => '10mbps',
-                '20mbps' => '20mbps',
-                '30mbps' => '30mbps',
-                '50mbps' => '50mbps',
-                '100mbps' => '100mbps',
-				'add more here' => 'add more here'
-                ),
+            'Type' => 'text',
+            'Size' => '10',
+            'Default' => '64',
+            'Description' => 'Masukan nama Profile yang ada pada mikrotik untuk paket ini',
         ),
         'Service' => array(
             'Type' => 'dropdown',
@@ -44,6 +38,7 @@ function cikipeh_ConfigOptions()
                 'sstp' => 'sstp',
 				//tipe layanannya
             ),
+            'Description' => 'Pilih tipe layanan yang ingin digunakan untuk paket ini'
             
         ),
     );
@@ -60,7 +55,8 @@ function cikipeh_CreateAccount($params)
     $brasip = $params['serverip'];
     $aman = 'https://';
     $apinya = '/rest/ppp/secret';
-    $urlpanggil = $aman . $brasip . $apinya;
+    $serverPort = $params['serverport'];
+    $urlpanggil = $aman . $brasip . ':' . $serverPort . $apinya ;
     $paket = $params['configoption1'];
     $tipe = $params['configoption2'];
     $miliksiapa = 'WHMCS Nama Customer: ' . $params['clientsdetails']['firstname'] . ' ' . $params['clientsdetails']['lastname'] . ', ID Customer: ' . $params['userid'];
@@ -104,10 +100,11 @@ function cikipeh_SuspendAccount($params)
     $brasip = $params['serverip'];
     $aman = 'https://';
     $apinya = '/rest/ppp/secret';
-    $urlpanggil = $aman . $brasip . $apinya;
+    $serverPort = $params['serverport'];
+    $urlpanggil = $aman . $brasip . ':' . $serverPort . $apinya;
     $urlubah = $urlpanggil . '/' . $idpelanggan;
     $apisuspend = '/rest/ppp/active';
-    $urlapisuspend = $aman . $brasip . $apisuspend;
+    $urlapisuspend = $aman . $brasip . ':' . $serverPort . $apisuspend;
     $paket = $params['configoption1'];
     $tipe = $params['configoption2'];
     $urlkill = $urlapisuspend . '/' . $idpelanggan;
@@ -168,14 +165,15 @@ function cikipeh_UnsuspendAccount($params)
     $brasip = $params['serverip'];
     $aman = 'https://';
     $apinya = '/rest/ppp/secret';
-    $urlpanggil = $aman . $brasip . $apinya;
+    $serverPort = $params['serverport'];
+    $urlpanggil = $aman . $brasip . ':' . $serverPort . $apinya;
     $urlunsuspend = $urlpanggil . '/' . $idpelanggan;
     $urlubah = $urlpanggil . '/' . $idpelanggan;
     $apisuspend = '/rest/ppp/active';
-    $urlapisuspend = $aman . $brasip . $apisuspend;
+    $urlapisuspend = $aman . $brasip . ':' . $serverPort . $apisuspend;
     $paket = $params['configoption1'];
     $tipe = $params['configoption2'];
-     $urlkill = $urlapisuspend . '/' . $idpelanggan;
+    $urlkill = $urlapisuspend . '/' . $idpelanggan;
     $yangmaudipake = array(
         "name" => $idpelanggan,
         "password" => $passinternet,
@@ -234,7 +232,8 @@ function cikipeh_TerminateAccount($params)
     $brasip = $params['serverip'];
     $aman = 'https://';
     $apinya = '/rest/ppp/secret';
-    $urlpanggil = $aman . $brasip . $apinya;
+    $serverPort = $params['serverport'];
+    $urlpanggil = $aman . $brasip . ':' . $serverPort . $apinya;
     $urlterminate = $urlpanggil . '/' . $idpelanggan;
     $paket = $params['configoption1'];
     $dipake_json = json_encode($yangmaudipake);
@@ -261,12 +260,13 @@ function cikipeh_KillSession($params)
     $brasip = $params['serverip'];
     $aman = 'https://';
     $apinya = '/rest/ppp/secret';
-    $urlpanggil = $aman . $brasip . $apinya;
+    $serverPort = $params['serverport'];
+    $urlpanggil = $aman . $brasip . ':' . $serverPort . $apinya;
     $urlubah = $urlpanggil . '/' . $idpelanggan;
     $paket = $params['configoption1'];
     $tipe = $params['configoption2'];
     $apisuspend = '/rest/ppp/active';
-    $urlapisuspend = $aman . $brasip . $apisuspend;
+    $urlapisuspend = $aman . $brasip . ':' . $serverPort . $apisuspend;
     $urlkill = $urlapisuspend . '/' . $idpelanggan;
     $yangmaudipake = array(
         "name" => $idpelanggan,
@@ -303,12 +303,13 @@ function cikipeh_ChangePackage($params)
     $brasip = $params['serverip'];
     $aman = 'https://';
     $apinya = '/rest/ppp/secret';
-    $urlpanggil = $aman . $brasip . $apinya;
+    $serverPort = $params['serverport'];
+    $urlpanggil = $aman . $brasip . ':' . $serverPort . $apinya;
     $urlubah = $urlpanggil . '/' . $idpelanggan;
     $paket = $params['configoption1'];
     $tipe = $params['configoption2'];
     $apisuspend = '/rest/ppp/active';
-     $urlapisuspend = $aman . $brasip . $apisuspend;
+    $urlapisuspend = $aman . $brasip . ':' . $serverPort . $apisuspend;
     $urlkill = $urlapisuspend . '/' . $idpelanggan;
     $yangmaudipake = array(
         "name" => $idpelanggan,
@@ -356,10 +357,36 @@ function cikipeh_ChangePackage($params)
 function cikipeh_TestConnection(array $params)
 {
     try {
-        // Call the service's connection test function.
 
-        $success = true;
-        $errorMsg = '';
+    $userserver = $params['serverusername'];
+    $passserver =  $params['serverpassword'];
+    $brasip = $params['serverip'];
+    $aman = 'https://';
+    $apinya = '/rest';
+    $serverPort = $params['serverport'];
+    $urlpanggil = $aman . $brasip . ':' . $serverPort . $apinya;
+    $brrcikipeh = curl_init();
+    curl_setopt($brrcikipeh, CURLOPT_URL, $urlpanggil);
+    curl_setopt($brrcikipeh, CURLOPT_RETURNTRANSFER, 1);
+    curl_setopt($brrcikipeh, CURLOPT_SSL_VERIFYHOST, FALSE);
+    curl_setopt($brrcikipeh, CURLOPT_SSL_VERIFYPEER, FALSE);
+    curl_setopt($brrcikipeh, CURLOPT_HTTPAUTH, CURLAUTH_BASIC);
+    curl_setopt($brrcikipeh, CURLOPT_USERPWD, $userserver . ':' . $passserver);
+    curl_setopt($brrcikipeh, CURLOPT_CUSTOMREQUEST, 'GET');
+    $eksekusi = curl_exec($brrcikipeh);
+    $httpcode = curl_getinfo($brrcikipeh, CURLINFO_HTTP_CODE);
+    if($httpcode == '400'){$success = true;
+        $errorMsg = '';}
+        else if($httpcode == '401'){
+            $success = false;
+        $errorMsg = 'Username atau Password Salah';
+        }       
+        else if($httpcode == '0'){
+            $success = false;
+        $errorMsg = 'IP Atau Port Salah, atau Server tidak dapat terhubung dengan router, mohon cek kembali';
+        // Call the service's connection test function.
+        }
+        
     } catch (Exception $e) {
         // Record the error in WHMCS's module log.
         logModuleCall(
@@ -542,9 +569,10 @@ function cikipeh_ClientArea(array $params)
     $apinya = '/rest/ppp/active';
     $apisatunya = '/rest/ppp/secret';
     $apisatunya2 = '/rest/ppp/profile';
-    $urlpanggil2 = $aman . $brasip . $apisatunya;
-    $urlpanggil = $aman . $brasip . $apinya;
-    $urlpanggil3 = $aman . $brasip . $apisatunya2;
+    $serverPort = $params['serverport'];
+    $urlpanggil = $aman . $brasip . ':' . $serverPort . $apinya;
+    $urlpanggil2 = $aman . $brasip . ':' . $serverPort . $apisatunya;
+    $urlpanggil3 = $aman . $brasip . ':' . $serverPort . $apisatunya2;
     $urlambil = $urlpanggil . '/' . $idpelanggan;
     $urlambil2 = $urlpanggil2 . '/' . $idpelanggan;
     $urlambil3 = $urlpanggil3 . '/' . $paketnya;
