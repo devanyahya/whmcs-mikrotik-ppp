@@ -146,7 +146,7 @@ else if($statusCode == 400){
     
 
 }
-
+//
 
 function cikipeh_SuspendAccount($params)
 {
@@ -183,7 +183,7 @@ function cikipeh_SuspendAccount($params)
     curl_setopt($brrcikipeh, CURLOPT_USERPWD, $userserver . ':' . $passserver);
     curl_setopt($brrcikipeh, CURLOPT_CUSTOMREQUEST, 'PATCH');
     curl_setopt($brrcikipeh, CURLOPT_POSTFIELDS, $dipake_json);
-    curl_setopt($brrcikipeh, CURLOPT_HEADER, true);
+    curl_setopt($brrcikipeh, CURLOPT_HEADER, FALSE);
     curl_setopt($brrcikipeh, CURLOPT_HTTPHEADER,
     array(
         'Content-Type:application/json',
@@ -203,15 +203,32 @@ function cikipeh_SuspendAccount($params)
 
     curl_setopt($brrcikipeh2, CURLOPT_CUSTOMREQUEST, 'DELETE');
     curl_setopt($brrcikipeh2, CURLOPT_POSTFIELDS, $dipake_json);
-    curl_setopt($brrcikipeh2, CURLOPT_HEADER, true);
+    curl_setopt($brrcikipeh2, CURLOPT_HEADER, TRUE);
     curl_setopt($brrcikipeh2, CURLOPT_HTTPHEADER,
     array(
         'Content-Type:application/json',
         'Content-Length: ' . strlen($dipake_json)
     ));
     $eksekusi2 = curl_exec($brrcikipeh2);
-    return 'success';
+    $responnya = json_decode($eksekusi, true);
+    $statusCode = curl_getinfo($brrcikipeh,CURLINFO_HTTP_CODE);
+    $errorcode = 'ERROR: ' . $responnya['detail'];
+    curl_close($brrcikipeh);
+
+    if($statusCode == 201){
+         return 'success';
     }
+    else if($statusCode == 200){
+         return 'success';
+    }
+    else if($statusCode == 400){
+      return $errorcode;
+    }
+    else{
+        return 'failed to connect to router';
+    }
+    
+}
     
     else if ($params['configoption3'] == Suspend ){
     $idpelanggan = $params['username'];
@@ -245,7 +262,7 @@ function cikipeh_SuspendAccount($params)
     curl_setopt($brrcikipeh, CURLOPT_USERPWD, $userserver . ':' . $passserver);
     curl_setopt($brrcikipeh, CURLOPT_CUSTOMREQUEST, 'PATCH');
     curl_setopt($brrcikipeh, CURLOPT_POSTFIELDS, $dipake_json);
-    curl_setopt($brrcikipeh, CURLOPT_HEADER, true);
+    curl_setopt($brrcikipeh, CURLOPT_HEADER, FALSE);
     curl_setopt($brrcikipeh, CURLOPT_HTTPHEADER,
     array(
         'Content-Type:application/json',
@@ -272,7 +289,23 @@ function cikipeh_SuspendAccount($params)
         'Content-Length: ' . strlen($dipake_json)
     ));
     $eksekusi2 = curl_exec($brrcikipeh2);
-    return 'success';
+    $responnya = json_decode($eksekusi, true);
+    $statusCode = curl_getinfo($brrcikipeh,CURLINFO_HTTP_CODE);
+    $errorcode = 'ERROR: ' . $responnya['detail'];
+    curl_close($brrcikipeh);
+
+    if($statusCode == 201){
+         return 'success';
+    }
+    else if($statusCode == 200){
+         return 'success';
+    }
+    else if($statusCode == 400){
+      return $errorcode;
+    }
+    else{
+        return 'failed to connect to router';
+    }
     }
     
 }
@@ -314,7 +347,7 @@ function cikipeh_UnsuspendAccount($params)
 
     curl_setopt($brrcikipeh, CURLOPT_CUSTOMREQUEST, 'PATCH');
     curl_setopt($brrcikipeh, CURLOPT_POSTFIELDS, $dipake_json);
-    curl_setopt($brrcikipeh, CURLOPT_HEADER, true);
+    curl_setopt($brrcikipeh, CURLOPT_HEADER, false);
     curl_setopt($brrcikipeh, CURLOPT_HTTPHEADER,
     array(
         'Content-Type:application/json',
@@ -340,9 +373,24 @@ function cikipeh_UnsuspendAccount($params)
     ));
     $eksekusi2 = curl_exec($brrcikipeh2);
     
-    return 'success';
+    $responnya = json_decode($eksekusi, true);
+    $statusCode = curl_getinfo($brrcikipeh,CURLINFO_HTTP_CODE);
+    $errorcode = 'ERROR: ' . $responnya['detail'];
+    curl_close($brrcikipeh);
 
-    return 'success';
+    if($statusCode == 201){
+         return 'success';
+    }
+    else if($statusCode == 200){
+         return 'success';
+    }
+    else if($statusCode == 400){
+      return $errorcode;
+    }
+    else{
+        return 'failed to connect to router';
+    }
+    
 }
 
 
@@ -358,8 +406,6 @@ function cikipeh_TerminateAccount($params)
     $serverPort = $params['serverport'];
     $urlpanggil = $aman . $brasip . ':' . $serverPort . $apinya;
     $urlterminate = $urlpanggil . '/' . $idpelanggan;
-    $paket = $params['configoption1'];
-    $dipake_json = json_encode($yangmaudipake);
     $brrcikipeh = curl_init();
     curl_setopt($brrcikipeh, CURLOPT_URL, $urlterminate);
     curl_setopt($brrcikipeh, CURLOPT_RETURNTRANSFER, 1);
@@ -367,54 +413,36 @@ function cikipeh_TerminateAccount($params)
     curl_setopt($brrcikipeh, CURLOPT_SSL_VERIFYPEER, FALSE);
     curl_setopt($brrcikipeh, CURLOPT_HTTPAUTH, CURLAUTH_BASIC);
     curl_setopt($brrcikipeh, CURLOPT_USERPWD, $userserver . ':' . $passserver);
-
     curl_setopt($brrcikipeh, CURLOPT_CUSTOMREQUEST, 'DELETE');
-    $eksekusi = curl_exec($brrcikipeh);
-
-    return 'success';
-}
-
-function cikipeh_KillSession($params)
-{
-    $idpelanggan = $params['username'];
-    $passinternet = $params['password'];
-    $userserver = $params['serverusername'];
-    $passserver =  $params['serverpassword'];
-    $brasip = $params['serverip'];
-    $aman = 'https://';
-    $apinya = '/rest/ppp/secret';
-    $serverPort = $params['serverport'];
-    $urlpanggil = $aman . $brasip . ':' . $serverPort . $apinya;
-    $urlubah = $urlpanggil . '/' . $idpelanggan;
-    $paket = $params['configoption1'];
-    $tipe = $params['configoption2'];
-    $apisuspend = '/rest/ppp/active';
-    $urlapisuspend = $aman . $brasip . ':' . $serverPort . $apisuspend;
-    $urlkill = $urlapisuspend . '/' . $idpelanggan;
-    $yangmaudipake = array(
-        "name" => $idpelanggan,
-        "password" => $passinternet,
-        "service" => $tipe,
-        "profile" => $paket,);
-    $dipake_json = json_encode($yangmaudipake);
-    $brrcikipeh2 = curl_init();
-    curl_setopt($brrcikipeh2, CURLOPT_URL, $urlkill);
-    curl_setopt($brrcikipeh2, CURLOPT_RETURNTRANSFER, 1);
-    curl_setopt($brrcikipeh2, CURLOPT_SSL_VERIFYHOST, FALSE);
-    curl_setopt($brrcikipeh2, CURLOPT_SSL_VERIFYPEER, FALSE);
-    curl_setopt($brrcikipeh2, CURLOPT_HTTPAUTH, CURLAUTH_BASIC);
-    curl_setopt($brrcikipeh2, CURLOPT_USERPWD, $userserver . ':' . $passserver);
-
-    curl_setopt($brrcikipeh2, CURLOPT_CUSTOMREQUEST, 'DELETE');
-    curl_setopt($brrcikipeh2, CURLOPT_POSTFIELDS, $dipake_json);
-    curl_setopt($brrcikipeh2, CURLOPT_HEADER, true);
-    curl_setopt($brrcikipeh2, CURLOPT_HTTPHEADER,
+    curl_setopt($brrcikipeh, CURLOPT_HEADER, false);
+    curl_setopt($brrcikipeh, CURLOPT_HTTPHEADER,
     array(
         'Content-Type:application/json',
         'Content-Length: ' . strlen($dipake_json)
     ));
-    $eksekusi2 = curl_exec($brrcikipeh2);
+    $eksekusi = curl_exec($brrcikipeh);
+    $responnya = json_decode($eksekusi, true);
+    $statusCode = curl_getinfo($brrcikipeh,CURLINFO_HTTP_CODE);
+    $errorcode = 'ERROR: ' . $responnya['detail'];
+    curl_close($brrcikipeh);
+
+    if($statusCode == 201){
+         return 'success';
+    }
+    else if($statusCode == 200){
+         return 'success';
+    }
+    else if($statusCode == 204){
+         return 'success';
+    }
+    else if($statusCode == 400){
+      return $errorcode;
+    }
+    else{
+        return 'failed to connect to router';
+    }
 }
+
 
 
 function cikipeh_ChangePackage($params)
@@ -477,6 +505,9 @@ function cikipeh_ChangePackage($params)
     
 }
 
+
+
+
 function cikipeh_TestConnection(array $params)
 {
     try {
@@ -530,49 +561,65 @@ function cikipeh_TestConnection(array $params)
     );
 }
 
-
-function cikipeh_buttonOneFunction(array $params)
+function cikipeh_AdminCustomButtonArray()
 {
-    try {
-        // Call the service's function, using the values provided by WHMCS in
-        // `$params`.
-    } catch (Exception $e) {
-        // Record the error in WHMCS's module log.
-        logModuleCall(
-            'cikipeh',
-            __FUNCTION__,
-            $params,
-            $e->getMessage(),
-            $e->getTraceAsString()
-        );
-
-        return $e->getMessage();
-    }
-
-    return 'success';
+    return array(
+        "Kill Session" => "KillSession",
+    );
 }
 
 
-function cikipeh_actionOneFunction(array $params)
+function cikipeh_KillSession($params)
 {
-    try {
-        // Call the service's function, using the values provided by WHMCS in
-        // `$params`.
-    } catch (Exception $e) {
-        // Record the error in WHMCS's module log.
-        logModuleCall(
-            'cikipeh',
-            __FUNCTION__,
-            $params,
-            $e->getMessage(),
-            $e->getTraceAsString()
-        );
+    $idpelanggan = $params['username'];
+    $passinternet = $params['password'];
+    $userserver = $params['serverusername'];
+    $passserver =  $params['serverpassword'];
+    $brasip = $params['serverip'];
+    $aman = 'https://';
+    $serverPort = $params['serverport'];
+    $urlubah = $urlpanggil . '/' . $idpelanggan;
+    $apisuspend = '/rest/ppp/active';
+    $urlapisuspend = $aman . $brasip . ':' . $serverPort . $apisuspend;
+    $urlkill = $urlapisuspend . '/' . $idpelanggan;
+    $brrcikipeh2 = curl_init();
+    curl_setopt($brrcikipeh2, CURLOPT_URL, $urlkill);
+    curl_setopt($brrcikipeh2, CURLOPT_RETURNTRANSFER, 1);
+    curl_setopt($brrcikipeh2, CURLOPT_SSL_VERIFYHOST, FALSE);
+    curl_setopt($brrcikipeh2, CURLOPT_SSL_VERIFYPEER, FALSE);
+    curl_setopt($brrcikipeh2, CURLOPT_HTTPAUTH, CURLAUTH_BASIC);
+    curl_setopt($brrcikipeh2, CURLOPT_USERPWD, $userserver . ':' . $passserver);
 
-        return $e->getMessage();
+    curl_setopt($brrcikipeh2, CURLOPT_CUSTOMREQUEST, 'DELETE');
+    curl_setopt($brrcikipeh2, CURLOPT_POSTFIELDS, $dipake_json);
+    curl_setopt($brrcikipeh2, CURLOPT_HEADER, false);
+    curl_setopt($brrcikipeh2, CURLOPT_HTTPHEADER,
+    array(
+        'Content-Type:application/json',
+        'Content-Length: ' . strlen($dipake_json)
+    ));
+    $eksekusi2 = curl_exec($brrcikipeh2);
+    $responnya = json_decode($eksekusi2, true);
+    $statusCode = curl_getinfo($brrcikipeh2,CURLINFO_HTTP_CODE);
+    $errorcode = 'ERROR: ' . $responnya['detail'];
+    curl_close($brrcikipeh2);
+
+    if($statusCode == 201){
+         return 'success';
     }
-
-    return 'success';
+    else if($statusCode == 200){
+         return 'success';
+    }
+    else if($statusCode == 400){
+      return $errorcode;
+    }
+    else{
+        return 'failed to connect to router';
+    }
 }
+
+
+
 
 function cikipeh_AdminServicesTabFields(array $params)
 {
