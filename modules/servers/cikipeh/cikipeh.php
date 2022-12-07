@@ -121,16 +121,29 @@ function cikipeh_CreateAccount($params)
     curl_setopt($brrcikipeh, CURLOPT_USERPWD, $userserver . ':' . $passserver);
     curl_setopt($brrcikipeh, CURLOPT_CUSTOMREQUEST, 'PUT');
     curl_setopt($brrcikipeh, CURLOPT_POSTFIELDS, $dipake_json);
-    curl_setopt($brrcikipeh, CURLOPT_HEADER, true);
+    curl_setopt($brrcikipeh, CURLOPT_HEADER, false);
     curl_setopt($brrcikipeh, CURLOPT_HTTPHEADER,
     array(
         'Content-Type:application/json',
         'Content-Length: ' . strlen($dipake_json)
     ));
     $eksekusi = curl_exec($brrcikipeh);
+    $responnya = json_decode($eksekusi, true);
+    $statusCode = curl_getinfo($brrcikipeh,CURLINFO_HTTP_CODE);
+    curl_close($brrcikipeh);
 
+  if($statusCode == 201){
+       return 'success';
+  }
+else if($statusCode == 400){
+
+      return $responnya['detail'];
+    }
+    else{
+        return 'failed to connect to router';
+    }
     
- return 'success';
+    
 
 }
 
